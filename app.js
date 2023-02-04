@@ -1,20 +1,26 @@
 /**
- * Filter data according to README.md
+ * Filter and count data according to README.md
  * @param {string} pattern
  *        A case-sensitive string pattern
+ * @param {boolean} count
+ *        Whether to add counting information according to README.md
  * @param {Array} data
  *        An array of countries element
  * @returns {Array}
  *        A new array containing filtered countries, people and animals
  */
-function filterData(pattern, data) {
+function filterCountData(pattern, count, data) {
 
   // here we use the function Array.reduce() to map and filter the input data at the same time
 
   function peopleReducer(result, people) {
     const animals = people.animals.filter(animal => animal.name.includes(pattern));
     if (animals.length > 0) {
-      result.push({...people, animals});
+      result.push({
+        ...people,
+        name: count ? `${people.name} [${animals.length}]` : people.name,
+        animals
+      });
     }
     return result;
   }
@@ -22,7 +28,11 @@ function filterData(pattern, data) {
   function countryReducer(result, country) {
     const people = country.people.reduce(peopleReducer, []);
     if (people.length > 0) {
-      result.push({...country, people});
+      result.push({
+        ...country,
+        name: count ? `${country.name} [${people.length}]` : country.name,
+        people
+      });
     }
     return result;
   }
@@ -34,18 +44,22 @@ function filterData(pattern, data) {
  * Parse command-line arguments
  * @param   {Array} argv
  *          Similar to process.argv
- * @returns {{pattern: string|undefined, error: undefined|{reason: string}}}}
+ * @returns {{pattern: string|undefined, count: boolean|undefined, error: undefined|{reason: string}}}}
  *          An object containing either the parsed options if arguments are valid or an error.
  */
 function parseArgs(argv) {
 
   // if no pattern is provided, the default value is an empty string, which does not filter anything.
   let pattern = "";
+  let count = false;
 
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i]
     if (arg.startsWith("--filter=")) {
       pattern = arg.split("=")[1];
+    }
+    else if (arg === "--count") {
+      count = true;
     }
     else {
       return {
@@ -58,6 +72,7 @@ function parseArgs(argv) {
 
   return {
     pattern,
+    count
   }
 }
 
@@ -72,7 +87,7 @@ function main(argv) {
     process.exit(1);
   }
 
-  const result = filterData(options.pattern, sampleData);
+  const result = filterCountData(options.pattern, options.count, sampleData);
 
   console.log(JSON.stringify(result, null, 2));
 }
@@ -83,6 +98,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  filterData,
+  filterCountData,
   parseArgs
 }
