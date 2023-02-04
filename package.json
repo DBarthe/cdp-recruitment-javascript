@@ -1,0 +1,15 @@
+{
+  "name": "cdp-recruitment-javascript",
+  "version": "1.0.0",
+  "description": "## Filter",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.4.1"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "barthelemy.delemotte@gmail.com",
+  "license": "ISC"
+}
